@@ -9,7 +9,7 @@
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "API_KEY",
@@ -35,14 +35,11 @@
 
         const callList = document.getElementById("callList");
 
-        onValue(ref(db, 'calledNumber'), (snapshot) => {
-            callList.innerHTML = "";
-            const number = snapshot.val();
-            if (number) {
-                const li = document.createElement("li");
-                li.textContent = number;
-                callList.appendChild(li);
-            }
+        // 呼ばれた番号が追加されるたびにリストに表示
+        onChildAdded(ref(db, 'calledNumbers'), (snapshot) => {
+            const li = document.createElement("li");
+            li.textContent = snapshot.val();
+            callList.appendChild(li);
         });
     </script>
 </head>
