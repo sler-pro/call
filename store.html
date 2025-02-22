@@ -37,6 +37,10 @@
                 // 注文番号を変更
                 firebase.database().ref('orders/' + orderId).update({
                     status: '準備完了'
+                }).then(() => {
+                    console.log("注文状態が変更されました");
+                }).catch((error) => {
+                    console.error("状態変更に失敗しました: ", error);
                 });
             };
             document.getElementById('orderList').appendChild(orderButton);
