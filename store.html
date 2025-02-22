@@ -40,8 +40,8 @@
             callButton.textContent = "呼び出す";
             callButton.className = "action-button";
             callButton.onclick = () => {
-                // 呼び出し番号を新しく追加
-                push(ref(db, 'calledNumbers'), number);
+                // 呼び出し番号を1つだけ追加
+                set(ref(db, 'calledNumbers'), number);
                 alert("番号を呼び出しました: " + number);
             };
 
@@ -50,20 +50,14 @@
             clearButton.className = "action-button";
             clearButton.onclick = () => {
                 remove(ref(db, `orders/${snapshot.key}`));
-                li.remove();
+                remove(ref(db, 'calledNumbers'));
+                callList.innerHTML = ""; // 呼ばれた番号を消す
                 alert("番号を消去しました: " + number);
             };
 
             li.appendChild(callButton);
             li.appendChild(clearButton);
             orderList.appendChild(li);
-        });
-
-        // 呼び出し番号リストをリアルタイムで更新
-        onChildAdded(ref(db, 'calledNumbers'), (snapshot) => {
-            const li = document.createElement("li");
-            li.textContent = snapshot.val();
-            callList.appendChild(li);
         });
 
         // 注文が削除された時
