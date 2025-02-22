@@ -32,6 +32,7 @@
             const li = document.createElement("li");
             li.textContent = snapshot.val();
             li.dataset.key = snapshot.key;
+            callList.innerHTML = ''; // 1つだけ表示されるようにする
             callList.appendChild(li);
         });
 
