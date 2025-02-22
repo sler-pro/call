@@ -65,6 +65,13 @@
             const item = document.querySelector(`li[data-key='${snapshot.key}']`);
             if (item) item.remove();
         });
+
+        // 呼ばれた番号が追加された時
+        onChildAdded(ref(db, 'calledNumbers'), (snapshot) => {
+            const li = document.createElement("li");
+            li.textContent = snapshot.val();
+            callList.appendChild(li);
+        });
     </script>
 </head>
 <body>
