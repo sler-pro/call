@@ -10,7 +10,7 @@
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onChildAdded, onChildRemoved, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, onChildAdded, onChildRemoved, set, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "API_KEY",
@@ -29,6 +29,7 @@
         const orderList = document.getElementById("orderList");
         const callList = document.getElementById("callList");
 
+        // 新しい注文が追加された時
         onChildAdded(ref(db, 'orders'), (snapshot) => {
             const li = document.createElement("li");
             const number = snapshot.val().number;
@@ -39,7 +40,8 @@
             callButton.textContent = "呼び出す";
             callButton.className = "action-button";
             callButton.onclick = () => {
-                set(ref(db, 'calledNumber'), number);
+                // 呼び出し番号を新しく追加
+                push(ref(db, 'calledNumbers'), number);
                 alert("番号を呼び出しました: " + number);
             };
 
@@ -48,7 +50,6 @@
             clearButton.className = "action-button";
             clearButton.onclick = () => {
                 remove(ref(db, `orders/${snapshot.key}`));
-                remove(ref(db, 'calledNumber'));
                 li.remove();
                 alert("番号を消去しました: " + number);
             };
@@ -58,16 +59,14 @@
             orderList.appendChild(li);
         });
 
-        onValue(ref(db, 'calledNumber'), (snapshot) => {
-            callList.innerHTML = "";
-            const number = snapshot.val();
-            if (number) {
-                const li = document.createElement("li");
-                li.textContent = number;
-                callList.appendChild(li);
-            }
+        // 呼び出し番号リストをリアルタイムで更新
+        onChildAdded(ref(db, 'calledNumbers'), (snapshot) => {
+            const li = document.createElement("li");
+            li.textContent = snapshot.val();
+            callList.appendChild(li);
         });
 
+        // 注文が削除された時
         onChildRemoved(ref(db, 'orders'), (snapshot) => {
             const item = document.querySelector(`li[data-key='${snapshot.key}']`);
             if (item) item.remove();
