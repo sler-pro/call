@@ -9,7 +9,7 @@
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, onChildRemoved } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "API_KEY",
@@ -27,11 +27,10 @@
 
         const callList = document.getElementById("callList");
 
-        // 呼ばれた番号を表示（1つまで）
+        // 呼ばれた番号をリアルタイムで表示
         onChildAdded(ref(db, 'calledNumbers'), (snapshot) => {
             const li = document.createElement("li");
             li.textContent = snapshot.val();
-            li.dataset.key = snapshot.key;
             callList.innerHTML = "";  // 既存の番号を消去
             callList.appendChild(li);  // 新しい番号のみ表示
         });
