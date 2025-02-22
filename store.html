@@ -10,7 +10,7 @@
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onChildAdded, onChildRemoved, set, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, onChildAdded, onChildRemoved, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "API_KEY",
@@ -52,7 +52,7 @@
                 // 消去した番号を削除
                 const key = snapshot.key;
                 remove(ref(db, `orders/${key}`));
-                remove(ref(db, `calledNumbers/${key}`));
+                remove(ref(db, `calledNumbers`)); // 消去した番号も両方のリストから削除
                 alert("番号を消去しました: " + number);
             };
 
