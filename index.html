@@ -33,10 +33,24 @@
             li.textContent = snapshot.val();
             callList.appendChild(li);
         });
+
+        // 数字を入力して送信
+        window.submitNumber = () => {
+            const numberInput = document.getElementById("numberInput").value;
+            if (numberInput) {
+                push(ref(db, 'orders'), { number: numberInput });
+                alert("番号を送信しました: " + numberInput);
+            }
+        };
     </script>
 </head>
 <body>
     <h1>番号通知システム - お客さん用</h1>
+    
+    <!-- 数字入力欄を復活させる -->
+    <input type="number" id="numberInput" placeholder="番号を入力">
+    <button onclick="submitNumber()">送信</button>
+
     <h2>呼ばれた番号</h2>
     <ul id="callList"></ul>
 </body>
