@@ -40,7 +40,12 @@
                 firebase.database().ref('orders/').push({
                     orderNumber: orderNumber,
                     status: '待機中'
+                }).then(() => {
+                    console.log("注文番号が送信されました");
+                }).catch((error) => {
+                    console.error("注文の送信に失敗しました: ", error);
                 });
+
                 document.getElementById('orderNumber').value = ''; // 入力欄をクリア
             }
         }
