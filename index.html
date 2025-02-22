@@ -31,8 +31,7 @@
         onChildAdded(ref(db, 'calledNumbers'), (snapshot) => {
             const li = document.createElement("li");
             li.textContent = snapshot.val();
-            callList.innerHTML = "";  // 既存の番号を消去
-            callList.appendChild(li);  // 新しい番号のみ表示
+            callList.appendChild(li);
         });
 
         // 数字を入力して送信
