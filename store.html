@@ -1,3 +1,57 @@
+<!-- index.html (お客さん側) -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>番号通知 - お客さん用</title>
+    <style>
+        #callList li { font-size: 3em; font-weight: bold; }
+    </style>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCH6zwHDxDsz1JVl3C_5NAFPa7vEfFOw_o",
+            authDomain: "call-7972e.firebaseapp.com",
+            databaseURL: "https://call-7972e-default-rtdb.firebaseio.com",
+            projectId: "call-7972e",
+            storageBucket: "call-7972e.firebasestorage.app",
+            messagingSenderId: "524718924216",
+            appId: "1:524718924216:web:fa1312e48099d60181af4d",
+            measurementId: "G-DE63T918LF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.submitNumber = () => {
+            const numberInput = document.getElementById("numberInput").value;
+            if (numberInput) {
+                push(ref(db, 'orders'), { number: numberInput });
+                alert("番号を送信しました: " + numberInput);
+            }
+        };
+
+        const callList = document.getElementById("callList");
+        onChildAdded(ref(db, 'calledNumbers'), (snapshot) => {
+            const li = document.createElement("li");
+            li.textContent = snapshot.val().number;
+            callList.appendChild(li);
+        });
+    </script>
+</head>
+<body>
+    <h1>番号通知システム - お客さん用</h1>
+    <input type="number" id="numberInput" placeholder="番号を入力">
+    <button onclick="submitNumber()">送信</button>
+    <h2>呼ばれた番号</h2>
+    <ul id="callList"></ul>
+</body>
+</html>
+
+
 <!-- store.html (お店側) -->
 <!DOCTYPE html>
 <html lang="ja">
@@ -5,9 +59,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>番号管理 - お店用</title>
+    <style>
+        #orderList li { font-size: 2em; font-weight: bold; }
+        .action-button { font-size: 1.5em; padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onChildAdded, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, onChildAdded, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCH6zwHDxDsz1JVl3C_5NAFPa7vEfFOw_o",
@@ -29,10 +87,25 @@
             const li = document.createElement("li");
             const number = snapshot.val().number;
             li.textContent = number;
-            li.onclick = () => {
+
+            const callButton = document.createElement("button");
+            callButton.textContent = "呼び出す";
+            callButton.className = "action-button";
+            callButton.onclick = () => {
                 push(ref(db, 'calledNumbers'), { number: number });
                 alert("番号を呼び出しました: " + number);
             };
+
+            const clearButton = document.createElement("button");
+            clearButton.textContent = "消去する";
+            clearButton.className = "action-button";
+            clearButton.onclick = () => {
+                remove(ref(db, 'calledNumbers'));
+                alert("呼ばれた番号を消去しました");
+            };
+
+            li.appendChild(callButton);
+            li.appendChild(clearButton);
             orderList.appendChild(li);
         });
     </script>
