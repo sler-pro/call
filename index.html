@@ -1,64 +1,56 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>お客さん側</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js"></script>
-  <style>
-    #numberDisplay {
-      font-size: 50px;
-      font-weight: bold;
-      margin-top: 20px;
-    }
-    input, button {
-      font-size: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>番号通知 - お客さん用</title>
+    <style>
+        #callList li { font-size: 3em; font-weight: bold; }
+    </style>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "API_KEY",
+            authDomain: "call-7972e.firebaseapp.com",
+            databaseURL: "https://call-7972e-default-rtdb.firebaseio.com",
+            projectId: "call-7972e",
+            storageBucket: "call-7972e.firebasestorage.app",
+            messagingSenderId: "524718924216",
+            appId: "1:524718924216:web:fa1312e48099d60181af4d",
+            measurementId: "G-DE63T918LF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.submitNumber = () => {
+            const numberInput = document.getElementById("numberInput").value;
+            if (numberInput) {
+                push(ref(db, 'orders'), { number: numberInput });
+                alert("番号を送信しました: " + numberInput);
+            }
+        };
+
+        const callList = document.getElementById("callList");
+
+        onValue(ref(db, 'calledNumber'), (snapshot) => {
+            callList.innerHTML = "";
+            const number = snapshot.val();
+            if (number) {
+                const li = document.createElement("li");
+                li.textContent = number;
+                callList.appendChild(li);
+            }
+        });
+    </script>
 </head>
 <body>
-  <h1>番号入力</h1>
-  <input type="number" id="inputNumber" placeholder="番号を入力">
-  <button id="submitNumber">送信</button>
-
-  <div id="numberDisplay">呼ばれた番号はここに表示されます</div>
-
-  <script>
-    // Firebaseの初期化
-    const firebaseConfig = {
-      apiKey: "AIzaSyCH6zwHDxDsz1JVl3C_5NAFPa7vEfFOw_o",
-      authDomain: "call-7972e.firebaseapp.com",
-      databaseURL: "https://call-7972e-default-rtdb.firebaseio.com",
-      projectId: "call-7972e",
-      storageBucket: "call-7972e.firebasestorage.app",
-      messagingSenderId: "524718924216",
-      appId: "1:524718924216:web:fa1312e48099d60181af4d",
-      measurementId: "G-DE63T918LF"
-    };
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    let currentNumber = 1; // 最初に送信する番号
-
-    // 入力された番号を送信する
-    document.getElementById('submitNumber').addEventListener('click', () => {
-      const numberInput = document.getElementById('inputNumber').value;
-      if (numberInput) {
-        db.ref('numbers/' + currentNumber).set({
-          number: numberInput,
-        });
-        currentNumber++;
-      }
-    });
-
-    // Firebaseのデータを監視して、呼ばれた番号を表示する
-    db.ref('calledNumber').on('value', (snapshot) => {
-      const calledNumber = snapshot.val();
-      if (calledNumber) {
-        document.getElementById('numberDisplay').textContent = `呼ばれた番号: ${calledNumber}`;
-      }
-    });
-  </script>
+    <h1>番号通知システム - お客さん用</h1>
+    <input type="number" id="numberInput" placeholder="番号を入力">
+    <button onclick="submitNumber()">送信</button>
+    <h2>呼ばれた番号</h2>
+    <ul id="callList"></ul>
 </body>
 </html>
