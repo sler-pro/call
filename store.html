@@ -40,7 +40,7 @@
             callButton.textContent = "呼び出す";
             callButton.className = "action-button";
             callButton.onclick = () => {
-                // 以前の呼ばれた番号を削除してから新しい番号を追加
+                // 既存の呼ばれた番号を消して新しい番号を設定
                 set(ref(db, 'calledNumbers'), number);
                 alert("番号を呼び出しました: " + number);
             };
@@ -52,7 +52,7 @@
                 // 消去した番号を削除
                 const key = snapshot.key;
                 remove(ref(db, `orders/${key}`));
-                remove(ref(db, `calledNumbers`)); // 消去した番号も両方のリストから削除
+                remove(ref(db, 'calledNumbers')); // 呼ばれた番号も削除
                 alert("番号を消去しました: " + number);
             };
 
@@ -71,15 +71,13 @@
         onChildAdded(ref(db, 'calledNumbers'), (snapshot) => {
             const li = document.createElement("li");
             li.textContent = snapshot.val();
-            li.dataset.key = snapshot.key;
-            callList.innerHTML = "";  // 既存の番号を消去
+            callList.innerHTML = "";  // 呼ばれた番号は1つのみ
             callList.appendChild(li);  // 新しい番号のみ表示
         });
 
-        // 呼ばれた番号が消去された場合にリストから削除
+        // 呼ばれた番号が消去された場合
         onChildRemoved(ref(db, 'calledNumbers'), (snapshot) => {
-            const item = document.querySelector(`li[data-key='${snapshot.key}']`);
-            if (item) item.remove();
+            callList.innerHTML = "";  // 既存の呼ばれた番号を消去
         });
     </script>
 </head>
