@@ -41,7 +41,16 @@
             callButton.className = "action-button";
             callButton.onclick = () => {
                 // 呼び出し番号を追加
-                push(ref(db, 'calledNumbers'), number);
+                const calledNumberRef = ref(db, 'calledNumbers');
+                
+                // すでに呼ばれている番号がない場合にのみ呼び出す
+                const checkIfCalled = onChildAdded(calledNumberRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        return; // 既に番号が呼ばれていたら何もしない
+                    }
+                    set(calledNumberRef, number); // 最初の1つを呼び出し
+                });
+
                 alert("番号を呼び出しました: " + number);
             };
 
@@ -72,6 +81,7 @@
             const li = document.createElement("li");
             li.textContent = snapshot.val();
             li.dataset.key = snapshot.key;
+            callList.innerHTML = ''; // 1つだけ表示されるようにする
             callList.appendChild(li);
         });
 
