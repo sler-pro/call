@@ -31,7 +31,14 @@
         onChildAdded(ref(db, 'calledNumbers'), (snapshot) => {
             const li = document.createElement("li");
             li.textContent = snapshot.val();
+            li.dataset.key = snapshot.key;
             callList.appendChild(li);
+        });
+
+        // 呼ばれた番号が消去された場合にリストから削除
+        onChildRemoved(ref(db, 'calledNumbers'), (snapshot) => {
+            const item = document.querySelector(`li[data-key='${snapshot.key}']`);
+            if (item) item.remove();
         });
 
         // 数字を入力して送信
