@@ -1,3 +1,4 @@
+<!-- index.html (お客さん側) -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -9,7 +10,7 @@
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, get, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "API_KEY",
@@ -25,13 +26,20 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        window.submitNumber = () => {
-            const numberInput = document.getElementById("numberInput").value;
-            if (numberInput) {
-                push(ref(db, 'orders'), { number: numberInput });
-                alert("番号を送信しました: " + numberInput);
+        async function assignNumber() {
+            const counterRef = ref(db, 'counter');
+            const snapshot = await get(counterRef);
+            let number = 1;
+
+            if (snapshot.exists()) {
+                number = snapshot.val() + 1;
+                if (number > 1000) number = 1;
             }
-        };
+
+            await set(counterRef, number);
+            push(ref(db, 'orders'), { number });
+            alert(`あなたの番号は: ${number}`);
+        }
 
         const callList = document.getElementById("callList");
 
@@ -44,12 +52,12 @@
                 callList.appendChild(li);
             }
         });
+
+        window.onload = assignNumber;
     </script>
 </head>
 <body>
     <h1>番号通知システム - お客さん用</h1>
-    <input type="number" id="numberInput" placeholder="番号を入力">
-    <button onclick="submitNumber()">送信</button>
     <h2>呼ばれた番号</h2>
     <ul id="callList"></ul>
 </body>
