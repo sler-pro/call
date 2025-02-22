@@ -10,7 +10,7 @@
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onChildAdded, onChildRemoved, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, onChildAdded, onChildRemoved, set, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "API_KEY",
@@ -40,8 +40,8 @@
             callButton.textContent = "呼び出す";
             callButton.className = "action-button";
             callButton.onclick = () => {
-                // 既存の呼ばれた番号を消して新しい番号を設定
-                set(ref(db, 'calledNumbers'), number);
+                // 呼び出し番号を追加
+                push(ref(db, 'calledNumbers'), number);
                 alert("番号を呼び出しました: " + number);
             };
 
@@ -49,10 +49,7 @@
             clearButton.textContent = "消去する";
             clearButton.className = "action-button";
             clearButton.onclick = () => {
-                // 消去した番号を削除
-                const key = snapshot.key;
-                remove(ref(db, `orders/${key}`));
-                remove(ref(db, 'calledNumbers')); // 呼ばれた番号も削除
+                remove(ref(db, `orders/${snapshot.key}`));
                 alert("番号を消去しました: " + number);
             };
 
@@ -71,13 +68,7 @@
         onChildAdded(ref(db, 'calledNumbers'), (snapshot) => {
             const li = document.createElement("li");
             li.textContent = snapshot.val();
-            callList.innerHTML = "";  // 呼ばれた番号は1つのみ
-            callList.appendChild(li);  // 新しい番号のみ表示
-        });
-
-        // 呼ばれた番号が消去された場合
-        onChildRemoved(ref(db, 'calledNumbers'), (snapshot) => {
-            callList.innerHTML = "";  // 既存の呼ばれた番号を消去
+            callList.appendChild(li);
         });
     </script>
 </head>
