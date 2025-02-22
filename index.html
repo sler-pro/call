@@ -1,4 +1,3 @@
-<!-- index.html (お客さん側) -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -10,7 +9,7 @@
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, onChildRemoved } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "API_KEY",
@@ -36,16 +35,14 @@
 
         const callList = document.getElementById("callList");
 
-        onChildAdded(ref(db, 'calledNumbers'), (snapshot) => {
-            const li = document.createElement("li");
-            li.textContent = snapshot.val().number;
-            li.dataset.key = snapshot.key;
-            callList.appendChild(li);
-        });
-
-        onChildRemoved(ref(db, 'calledNumbers'), (snapshot) => {
-            const item = document.querySelector(`li[data-key='${snapshot.key}']`);
-            if (item) item.remove();
+        onValue(ref(db, 'calledNumber'), (snapshot) => {
+            callList.innerHTML = "";
+            const number = snapshot.val();
+            if (number) {
+                const li = document.createElement("li");
+                li.textContent = number;
+                callList.appendChild(li);
+            }
         });
     </script>
 </head>
